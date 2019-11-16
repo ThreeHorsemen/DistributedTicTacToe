@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 import json
 import socket
 
 from random import randrange
-
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 state = {}
 state['number_of_players'] = 0
@@ -13,6 +15,7 @@ game = []
 id = 0
 
 @app.route('/game', methods = ['GET'])
+@cross_origin()
 def foo():
     global id
 
@@ -41,6 +44,7 @@ def foo():
 
 
 @app.route('/heartbeat', methods = ['POST'])
+@cross_origin()
 def heartbeat():
     data = json.loads(request.json)
     rid = data['id']
@@ -59,6 +63,7 @@ def heartbeat():
 
 
 @app.route('/turn', methods = ['POST'])
+@cross_origin()
 def process_turn():
     data = json.loads(request.json)
     move = data['index']
@@ -84,6 +89,7 @@ def process_turn():
 
 
 @app.route('/')
+@cross_origin()
 def main_page():
     return jsonify(value='TicTacToe')
 

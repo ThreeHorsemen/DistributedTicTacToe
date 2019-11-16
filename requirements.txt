@@ -1,2 +1,3 @@
 flask
+flas-cors
 json
