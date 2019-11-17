@@ -10,7 +10,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 state = {}
 state['number_of_players'] = 0
-game = []
+game = [0 for i in range(9)]
 
 id = 0
 
@@ -18,6 +18,8 @@ id = 0
 @cross_origin()
 def foo():
     global id
+    state['winner'] = 0
+    state['turn'] = 0
 
     if state['number_of_players'] < 2:
         id += 1
@@ -27,7 +29,6 @@ def foo():
             state['player1'] = id
         else:
             state['player2'] = id
-            state['winner'] = 0
 
             x = randrange(1, 100)
 
@@ -35,8 +36,6 @@ def foo():
                 state['turn'] = state['player1']
             else:
                 state['turn'] = state['player2']
-
-            game = [0 for i in range(9)]
 
         return jsonify(id = id, status = True)
     else:
@@ -46,7 +45,8 @@ def foo():
 @app.route('/heartbeat', methods = ['POST'])
 @cross_origin()
 def heartbeat():
-    data = json.loads(request.json)
+    print(game)
+    data = request.json
     rid = data['id']
 
     if state['winner'] != 0:
@@ -59,18 +59,19 @@ def heartbeat():
     if state['turn'] == rid:
         return jsonify(value= True, game=game, game_ongoing= True)
     else:
-        return jsonify(value=False, game_ongoing= True)
+        return jsonify(value=False, game=game, game_ongoing= True)
 
 
 @app.route('/turn', methods = ['POST'])
 @cross_origin()
 def process_turn():
-    data = json.loads(request.json)
+
+    data = request.json
     move = data['index']
     rid = data['id']
 
     if game[move] != 0:
-        return jsonify(value=False)
+        return jsonify(value=False, game=game)
     else:
         game[move] = rid 
 
@@ -83,8 +84,8 @@ def process_turn():
             state['turn'] = state['player2']
         else:
             state['turn'] = state['player1']
-
-
+        
+        return jsonify(value=True, game=game)
 
 
 
