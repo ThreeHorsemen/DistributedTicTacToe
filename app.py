@@ -10,14 +10,17 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 state = {}
 state['number_of_players'] = 0
-game = [0 for i in range(9)]
+game = []
 
 id = 0
+winning_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
 @app.route('/game', methods = ['GET'])
 @cross_origin()
 def foo():
     global id
+    global state
+    global game
     state['winner'] = 0
     state['turn'] = 0
 
@@ -31,6 +34,7 @@ def foo():
             state['player2'] = id
 
             x = randrange(1, 100)
+            game = [0 for i in range(9)]
 
             if x <= 50:
                 state['turn'] = state['player1']
@@ -45,7 +49,8 @@ def foo():
 @app.route('/heartbeat', methods = ['POST'])
 @cross_origin()
 def heartbeat():
-    print(game)
+    global state
+    global game
     data = request.json
     rid = data['id']
 
@@ -65,7 +70,8 @@ def heartbeat():
 @app.route('/turn', methods = ['POST'])
 @cross_origin()
 def process_turn():
-
+    global state
+    global game
     data = request.json
     move = data['index']
     rid = data['id']
@@ -95,29 +101,18 @@ def main_page():
     return jsonify(value='TicTacToe')
 
 def reset_game():
+    global state
     state['number_of_players'] = 0
 
 
 def check_if_game_has_been_won():
-    if ((game[0] == game[1] == game[2]) and game[0] != 0):
-        return True
-    elif ((game[3] == game[4] == game[5]) and game[3] != 0):
-        return True
-    elif ((game[6] == game[7] == game[8]) and game[6] != 0):
-        return True
-    elif ((game[0] == game[3] == game[6]) and game[0] != 0):
-        return True
-    elif ((game[1] == game[4] == game[7]) and game[1] != 0):
-        return True
-    elif ((game[2] == game[5] == game[8]) and game[2] != 0):
-        return True
-    elif ((game[0] == game[4] == game[8]) and game[0] != 0):
-        return True
-    elif ((game[2] == game[4] == game[6]) and game[2] != 0):
-        return True
-    else:
-        return False
+    global winning_combinations
+    global game
 
+    for c in winning_combinations:
+        if (game[c[0]] == game[c[1]] == game[c[2]]) and (game[c[0]] != 0):
+            return True
+    return False
 
 
 if __name__ == '__main__':
