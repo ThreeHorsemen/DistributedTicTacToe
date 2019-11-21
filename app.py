@@ -59,9 +59,9 @@ def heartbeat():
     data = request.json
     rid = data['id']
 
-    if rid == state['player1']:
+    if "player1" in state and rid == state['player1']:
         state['player1ls'] = time.time()
-    elif rid == state['player2']:
+    elif "player2" in state and rid == state['player2']:
         state['player2ls'] = time.time()
 
     if state['winner'] != 0:
