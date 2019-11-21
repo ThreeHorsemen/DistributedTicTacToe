@@ -76,7 +76,7 @@ def heartbeat():
 
         return ret
 
-    if state['turn'] == rid:
+    if "turn" in state and state['turn'] == rid:
         return jsonify(value= True, game=game, game_ongoing= True)
     else:
         return jsonify(value=False, game=game, game_ongoing= True)
