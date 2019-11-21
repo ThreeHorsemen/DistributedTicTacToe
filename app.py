@@ -56,12 +56,15 @@ def heartbeat():
 
     if state['winner'] != 0:
 
+        ret = jsonify(value= True, game_ongoing= False, winner = state['winner'], game=game )
+
         if rid not in state['players_informed_of_winner']:
             state['players_informed_of_winner'].append(rid)
 
         if len(state['players_informed_of_winner']) == 2:
             reset_game()
-        return jsonify(value= True, game_ongoing= False, winner = state['winner'], game=game )
+            
+        return ret
 
     if state['turn'] == rid:
         return jsonify(value= True, game=game, game_ongoing= True)
@@ -104,7 +107,10 @@ def main_page():
 
 def reset_game():
     global state
+    global game
+    state = {}
     state['number_of_players'] = 0
+    game = []
 
 
 def check_if_game_has_been_won():
