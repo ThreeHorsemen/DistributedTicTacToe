@@ -147,7 +147,7 @@ def status_check():
         currentTime = time.time()
 
         if (currentTime - state['player1ls']) > 15 or (currentTime - state['player2ls']) > 15:
-        reset_game()
+            reset_game()
 
 schedule.every(10).seconds.do(status_check)
 if __name__ == '__main__':
