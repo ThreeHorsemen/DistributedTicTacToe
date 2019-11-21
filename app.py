@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 import json
+import time
 import socket
+import schedule
 
 from random import randrange
 app = Flask(__name__)
@@ -30,8 +32,10 @@ def foo():
 
         if  state['number_of_players'] == 1:
             state['player1'] = id
+            state['player1ls'] = time.time()
         else:
             state['player2'] = id
+            state['player2ls'] = time.time()
 
             x = randrange(1, 100)
             game = [0 for i in range(9)]
@@ -41,6 +45,7 @@ def foo():
             else:
                 state['turn'] = state['player2']
 
+         
         return jsonify(id = id, status = True)
     else:
         return jsonify(status= False)
@@ -53,6 +58,11 @@ def heartbeat():
     global game
     data = request.json
     rid = data['id']
+
+    if rid == state['player1']:
+        state['player1ls'] = time.time()
+    elif rid == state['player2']:
+        state['player2ls'] = time.time()
 
     if state['winner'] != 0:
 
@@ -130,8 +140,16 @@ def check_if_game_has_been_won():
     
     return -1
     
+def status_check()
+    global state
+    if state['player1'] and state['player2']:
 
+        currentTime = time.time()
 
+        if (currentTime - state['player1ls']) > 15 or (currentTime - state['player2ls']) > 15:
+        reset_game()
+
+schedule.every(10).seconds.do(status_check)
 if __name__ == '__main__':
 
     app.run()
