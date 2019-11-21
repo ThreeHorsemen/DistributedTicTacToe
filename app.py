@@ -17,6 +17,7 @@ game = []
 id = 0
 winning_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
+# Start a new game requested by client, send status false if a game has already been started
 @app.route('/game', methods = ['GET'])
 @cross_origin()
 def foo():
@@ -50,7 +51,7 @@ def foo():
     else:
         return jsonify(status= False)
 
-
+# Uset to respond to heartbeat post requests by the clients.
 @app.route('/heartbeat', methods = ['POST'])
 @cross_origin()
 def heartbeat():
@@ -81,7 +82,8 @@ def heartbeat():
     else:
         return jsonify(value=False, game=game, game_ongoing= True)
 
-
+# Used to receive turn move requests by clients and to process them 
+# and add them to the game board maintained by the server
 @app.route('/turn', methods = ['POST'])
 @cross_origin()
 def process_turn():
@@ -110,14 +112,13 @@ def process_turn():
             state['turn'] = state['player1']
         
         return jsonify(value=True, game=game)
-
-
-
+#Root
 @app.route('/')
 @cross_origin()
 def main_page():
     return jsonify(value='TicTacToe')
 
+# Reset game state to default values
 def reset_game():
     global state
     global game
@@ -125,7 +126,7 @@ def reset_game():
     state['number_of_players'] = 0
     game = []
 
-
+# Check possible configurations for wins or a draw
 def check_if_game_has_been_won():
     global winning_combinations
     global game
@@ -140,6 +141,8 @@ def check_if_game_has_been_won():
     
     return -1
     
+# Check if a client hasn't sent a heartbeat in 15 seconds
+# Reset the game incase of disconnects.
 def status_check():
     global state
     if "player1" in state and "player2" in state:
@@ -148,6 +151,7 @@ def status_check():
         if (currentTime - state['player1ls']) > 15 or (currentTime - state['player2ls']) > 15:
             reset_game()
 
+# Wrapper for status check intervals
 def set_interval(func, sec):
     def func_wrapper():
         set_interval(func, sec)
@@ -155,6 +159,7 @@ def set_interval(func, sec):
     t = threading.Timer(sec, func_wrapper)
     t.start()
     return t
+
 if __name__ == '__main__':
     set_interval(status_check, 10)
     app.run()
