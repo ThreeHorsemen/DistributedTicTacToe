@@ -64,7 +64,7 @@ def heartbeat():
     elif "player2" in state and rid == state['player2']:
         state['player2ls'] = time.time()
 
-    if state['winner'] != 0:
+    if "winner" in state and state['winner'] != 0:
 
         ret = jsonify(value= True, game_ongoing= False, winner = state['winner'], game=game )
 
