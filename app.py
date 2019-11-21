@@ -3,7 +3,7 @@ from flask_cors import CORS, cross_origin
 import json
 import time
 import socket
-import schedule
+import threading
 
 from random import randrange
 app = Flask(__name__)
@@ -142,14 +142,19 @@ def check_if_game_has_been_won():
     
 def status_check():
     global state
-    if state['player1'] and state['player2']:
-
+    if "player1" in state and "player2" in state:
         currentTime = time.time()
 
         if (currentTime - state['player1ls']) > 15 or (currentTime - state['player2ls']) > 15:
             reset_game()
 
-schedule.every(10).seconds.do(status_check)
+def set_interval(func, sec):
+    def func_wrapper():
+        set_interval(func, sec)
+        func()
+    t = threading.Timer(sec, func_wrapper)
+    t.start()
+    return t
 if __name__ == '__main__':
-
+    set_interval(status_check, 10)
     app.run()
