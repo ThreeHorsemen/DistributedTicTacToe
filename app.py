@@ -140,7 +140,7 @@ def check_if_game_has_been_won():
     
     return -1
     
-def status_check()
+def status_check():
     global state
     if state['player1'] and state['player2']:
 
